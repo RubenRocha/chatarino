@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Chatarino</title>
+  <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      form { background: #333; padding: 5px; position: fixed; bottom: 0; width: 100%; }
+      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
+      button { width: 60px; background: rgb(0, 100, 255); border: none; padding: 10px; color: #fff }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+      .admin-container {
+        float: right;
+        margin-top: 10px;
+        margin-right: 1%;
+        border: 1px solid black;
+        width: 200px;
+      }
+      .admin-users { list-style-type: none; }
+      .btn-down {
+        position: fixed;
+        bottom: 3px;
+        padding: 10px;
+        right: 5px;
+      }
+      .online-users {
+        position: absolute;
+        top: 5%;
+        left: 2%;
+        border: 1px solid;
+        width: 13%;
+        padding: 5px;
+      }
+      .container {
+          width: 50%;
+          position: absolute;
+          top: 15%;
+          overflow: auto;
+          left: 25%;
+          max-height: 70%;
+      }
+      .msga {
+        background-color: #e46a6a;
+      }
+    </style>
+</head>
+
+<body>
+  <div class="container">
+    <ul id="messages"></ul>
+  </div>
+  <form action="">
+    <input id="m" autocomplete="off" />
+    <button disabled='disabled' class="btn-send">Send</button>
+  </form>
+  <button disabled='disabled' class="btn-down" onClick="downloadChat(this);">Down</button>
+<div id="selected-user" style="display:none">
+</div>
+<div class="online-users">
+  No online users.
+</div>
+<div class="admin-container">
+  <h3>Admin chat list</h3>
+  <ul class="admin-users">
+    <li>No convos</li>
+  </ul>
+</div>
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<script>
+
+  var socket = io();
+
+  var dq = document.querySelector;
+  $('form').submit(function (e) {
+    socket.emit('message', $("#selected-user").html(), $('#m').val());
+    $('#messages').append($('<li>').text("Me:" + $('#m').val()));
+    $(".container").scrollTop($(".container")[0].scrollHeight);
+    $('#m').val('');
+    e.preventDefault();
+    return false;
+  });
+  socket.on('message', function (msg, usr) {
+    if (usr == $("#selected-user").text()) {
+      $('#messages').append($('<li>').text(usr + ": " + msg));
+      $(".container").scrollTop($(".container")[0].scrollHeight);
+    } else {
+      $('.online-user[data-username="' + usr + '"]').addClass("msga");
+    }
+  });
+</script>
+<script src="js/index_admin.js"></script>
+</body>
+
+</html>
